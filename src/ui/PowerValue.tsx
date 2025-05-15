@@ -5,6 +5,14 @@ export interface PowerValueProps {
   className?: string;
 }
 
+const sizeClamps = {
+  base: "text-[clamp(1.5rem,4vw,2.5rem)]",
+  sm: "sm:text-[clamp(2rem,5vw,3.5rem)]",
+  md: "md:text-[clamp(2.5rem,6vw,4.5rem)]",
+  lg: "lg:text-[clamp(3rem,7vw,5.5rem)]",
+  xl: "xl:text-[clamp(3.5rem,8vw,6.5rem)]",
+};
+
 export const PowerValue = ({
   unit,
   value,
@@ -20,7 +28,13 @@ export const PowerValue = ({
 
   return (
     <div
-      className={`flex items-center gap-2 font-bold text-[clamp(2rem,5vw,4rem)] ${className}`}
+      className={`flex items-center gap-2 font-bold \
+        ${sizeClamps.base}
+        ${sizeClamps.sm}
+        ${sizeClamps.md}
+        ${sizeClamps.lg}
+        ${sizeClamps.xl} 
+        ${className}`}
     >
       <span className={signColor}>{value}</span>
       <span className={`ml-1 ${signColor}`}>{unit}</span>

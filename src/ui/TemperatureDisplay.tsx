@@ -4,17 +4,21 @@ import { arrowUp, arrowDown } from "ionicons/icons";
 interface TemperatureDisplayProps {
   value: number | string;
   trend: number;
+  className?: string;
 }
 
 export const TemperatureDisplay = ({
   value,
   trend,
+  className,
 }: TemperatureDisplayProps) => {
   const isRising = trend > 0;
   const isFalling = trend < 0;
 
   return (
-    <div className="flex items-center justify-center h-full space-x-3 relative">
+    <div
+      className={`flex items-center justify-center h-full space-x-3 relative ${className}`}
+    >
       {/* Temperature Value with Degree Symbol */}
       <div className="text-6xl font-bold text-white">
         {value}

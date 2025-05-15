@@ -60,8 +60,14 @@ export const PowerProvider = ({ children }: { children: ReactNode }) => {
 
       const solarProduction = data[14] + data[15];
       const currentCharge = toSigned(data[41]);
-      const gridExport = toSigned32(packU16([data[34], data[35]]));
-      const householdUsage = -gridExport + solarProduction - currentCharge;
+      let gridExport = toSigned32(packU16([data[34], data[35]]));
+      let householdUsage = -gridExport + solarProduction - currentCharge;
+
+      const clamp = (value: number, min: number, max: number) =>
+        Math.max(min, Math.min(max, value));
+
+      gridExport = clamp(gridExport, -10000, 10000);
+      householdUsage = clamp(householdUsage, -10000, 10000);
 
       setPowerData({
         solarProduction,

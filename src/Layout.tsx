@@ -4,7 +4,6 @@ import {
   homeOutline,
   sunnyOutline,
   batteryFull,
-  snowOutline,
 } from "ionicons/icons";
 import { PowerListItem } from "./ui/PowerListItem";
 import { usePower } from "./services";
@@ -27,53 +26,48 @@ export const Layout = () => {
   return (
     <div className="flex h-screen w-screen text-white bg-gray-900">
       {/* Left Panel */}
-      <div className="flex flex-col w-[320px] min-w-[280px] bg-gray-800">
+      <aside className="flex flex-col flex-none flex-shrink-0 w-1/3 sm:w-1/4 md:w-1/5 min-w-0 bg-gray-800 overflow-y-auto shadow-2xs">
         {/* Top Temperature Area */}
-        <div className="h-[120px] bg-gray-500 flex items-center justify-center font-bold text-2xl">
+        <div className="flex items-center justify-center bg-gray-500 font-bold text-[clamp(1.25rem,3vw,2rem)] sm:text-[clamp(1.5rem,3.5vw,2.5rem)] md:text-[clamp(2rem,4vw,3rem)] h-[clamp(4rem,10vh,8rem)]">
           {error ? (
-            <span className="text-5xl">Error</span>
+            <span className="text-[clamp(1.5rem,4vw,3rem)]">Error</span>
           ) : (
             <TemperatureDisplay value={temperature} trend={trend} />
           )}
         </div>
 
         {/* Battery Section */}
-        <div className="flex flex-col justify-center items-center p-6 flex-grow">
+        <div className="flex flex-col flex-grow items-center justify-center p-6 sm:p-6">
           <BatteryDisplay
             value={totalCapacity}
             isCharging={currentCharge > 0}
-            className="w-64 max-w-full h-full"
-          />
-          <PowerValue
-            unit="w"
-            value={Math.abs(currentCharge)}
-            direction={Math.sign(-currentCharge)}
-            className="text-[clamp(2rem,4vw,3rem)] max-w-full"
+            className="w-full"
           />
         </div>
-      </div>
+      </aside>
 
       {/* Right Panel */}
-      <div className="flex flex-col flex-grow p-10 gap-8">
+      <main className="flex flex-col flex-grow overflow-y-auto p-4 sm:p-8 md:p-10 gap-4 sm:gap-6 md:gap-8">
         {/* Solar Production */}
-        <div className="flex justify-between items-center border-b border-white/10 pb-4">
-          <div className="flex items-center gap-4">
+        <section className="flex justify-between items-center border-b border-white/10 pb-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <IonIcon
               icon={sunnyOutline}
-              className="text-[clamp(2rem,6vw,4rem)] text-yellow-400"
+              className="text-[clamp(2rem,5vw,3rem)] text-yellow-400"
             />
-            <span className="text-xl md:text-2xl">Solární Panely</span>
+            <span className="text-[clamp(1rem,2.5vw,1.5rem)] sm:text-[clamp(1.25rem,2.8vw,1.75rem)] md:text-[clamp(1.5rem,3vw,2rem)]">
+              Solární Panely
+            </span>
           </div>
           <PowerValue
             unit="w"
             value={solarProduction}
             direction={Math.sign(solarProduction)}
-            className="text-[clamp(3rem,8vw,6rem)]"
           />
-        </div>
+        </section>
 
         {/* Other Power Stats */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:gap-6">
           {/* Household Usage */}
           <PowerListItem icon={homeOutline} label="Domácnost">
             <PowerValue
@@ -81,11 +75,6 @@ export const Layout = () => {
               value={Math.abs(householdUsage)}
               direction={Math.sign(-householdUsage)}
             />
-          </PowerListItem>
-
-          {/* Heat Pump Consumption */}
-          <PowerListItem icon={snowOutline} label="Tepelné Čerpadlo">
-            <PowerValue unit="w" value={0} direction={0} />
           </PowerListItem>
 
           {/* Grid Export/Import */}
@@ -106,7 +95,7 @@ export const Layout = () => {
             />
           </PowerListItem>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

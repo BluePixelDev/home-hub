@@ -1,1 +1,1 @@
-export * from "./PowerProvvider";
+export * from "./PowerProvider";

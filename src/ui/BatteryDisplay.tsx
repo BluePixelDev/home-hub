@@ -28,27 +28,27 @@ export const BatteryDisplay = ({
           }}
         />
 
-        {/* Percentage and Charging Icon */}
+        {/* Percentage & Charging Wrapper */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white drop-shadow-md">
-          <div className="font-extrabold text-3xl sm:text-4xl md:text-8xl text-white relative">
+          <div className="font-extrabold text-[clamp(1.5rem,5vw,4rem)] leading-none">
             {level}
-            <span className="text-2xl sm:text-3xl">%</span>
-
-            {/* Charging Icon */}
-            {isCharging && (
-              <div className="absolute left-1/2 top-[100%] transform -translate-x-1/2">
-                <IonIcon
-                  icon={batteryChargingOutline}
-                  className="text-6xl animate-pulse text-white"
-                />
-              </div>
-            )}
+            <span className="text-[clamp(1rem,4vw,2rem)] ml-1">%</span>
           </div>
+
+          {/* Charging Icon absolute at bottom */}
+          {isCharging && (
+            <IonIcon
+              icon={batteryChargingOutline}
+              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[clamp(1.2rem,5vw,4rem)] animate-pulse text-white"
+            />
+          )}
         </div>
       </div>
 
       {/* Label */}
-      <span className="text-white text-lg md:text-xl mt-2">{label}</span>
+      <span className="text-[clamp(0.875rem,2vw,1.25rem)] md:text-[clamp(1rem,2.5vw,1.5rem)] mt-2">
+        {label}
+      </span>
     </div>
   );
 };

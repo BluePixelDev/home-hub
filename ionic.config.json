@@ -1,0 +1,7 @@
+{
+  "name": "HomeHub",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

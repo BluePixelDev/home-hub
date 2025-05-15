@@ -1,0 +1,140 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
+
+class TemperatrueModel {
+  final double temperature;
+  final int trend;
+  final bool error;
+
+  TemperatrueModel({
+    required this.temperature,
+    required this.trend,
+    required this.error,
+  });
+}
+
+class DataTempService extends ChangeNotifier {
+  final String _url = dotenv.env['WBOX_API_URL'] ?? "";
+  Timer? _timer;
+
+  late TemperatrueModel serviceData;
+  final logger = Logger();
+
+  DataTempService() {
+    serviceData = TemperatrueModel(
+      temperature: 0,
+      trend: 1,
+      error: false,
+    );
+
+    _startFetchingData();
+  }
+
+  void _startFetchingData() {
+    updateSensorData();
+
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      updateSensorData();
+    });
+  }
+
+  ///Main update method.
+  void updateSensorData() async {
+    if (await checkSensorStatus()) {
+      //Attempts to fetch data
+      await fetchSensorData();
+    } else {
+      //Changes error boolean to desired value
+      setDataError(true);
+    }
+    notifyListeners();
+  }
+
+  ///Checks availibility of the temperature sensor before making call to fetch data.
+  Future<bool> checkSensorStatus() async {
+    var devCheckUrl = Uri.parse('$_url/api/device/state');
+    var devCheckResponse = await http.get(devCheckUrl);
+    return devCheckResponse.statusCode == 200;
+  }
+
+  ///Fetches sensor data and update temperature model.
+  Future<void> fetchSensorData() async {
+    try {
+      var dataFetchUrl = Uri.parse('$_url/state/extended');
+      var dataFetchResponse = await http.get(dataFetchUrl);
+
+      if (dataFetchResponse.statusCode == 200) {
+        final jsonResponse = jsonDecode(dataFetchResponse.body);
+        final multiSensor = jsonResponse['multiSensor'];
+        final sensors = multiSensor['sensors'];
+
+        //==== SENSOR ====
+        if (sensors is List && sensors.isNotEmpty) {
+          final sensorData = sensors.first;
+
+          //Values
+          var trend = sensorData['trend']; //Trend
+          var temp = sensorData['value']; //Temperature
+
+          if (temp != null) {
+            serviceData = TemperatrueModel(
+              temperature: convertTemperatureValue(temp),
+              trend: convertTrendvalue(trend),
+              error: false,
+            );
+          }
+        } else {
+          setDataError(true);
+        }
+      }
+    } catch (e) {
+      logger.e('Error: $e');
+      setDataError(true);
+    }
+  }
+
+  double convertTemperatureValue(int temperature) {
+    return (temperature ~/ 10) / 10;
+  }
+
+  /// Converts trend value received from API call to comptable value used in the app.
+  /// Converts values (0, 1, 2, 3) to (1, 0, -1)
+  int convertTrendvalue(int trend) {
+    int trendConverted = 0;
+    switch (trend) {
+      case 0:
+      case 1:
+        trendConverted = 0;
+        break;
+      case 2:
+        trendConverted = -1;
+        break;
+      case 3:
+        trendConverted = 1;
+        break;
+      default:
+        trendConverted = 0;
+    }
+    return trendConverted;
+  }
+
+  ///Sets error value in serviceData to desired value and notifies listeners.
+  void setDataError(bool error) {
+    serviceData = TemperatrueModel(
+      temperature: serviceData.temperature,
+      trend: serviceData.trend,
+      error: true,
+    );
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
